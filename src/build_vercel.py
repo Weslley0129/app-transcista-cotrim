@@ -27,7 +27,7 @@ og.save(f'{OUT}/og.jpg','JPEG',quality=82)
 
 css=open('style.css').read(); js=open('app.js').read()
 cfg=json.loads(re.search(r'cfg=(\{.*?\})\nout=',open('build.py').read(),re.S).group(1))
-IMG={k:f"/img/{k}.jpg" for k in ["nago","infantil","box","masc"]}; IMG["quasar"]="/img/quasartcode.png"; shutil.copy("quasartcode-logo.png",OUT+"/img/quasartcode.png")
+IMG={k:f"/img/{k}.jpg" for k in ["nago","infantil","box","masc"]}; IMG["quasar"]="/img/quasartcode.png"; IMG["hair"]="/img/hero-braids.jpg"; shutil.copy("hero-braids.jpg",OUT+"/img/hero-braids.jpg"); shutil.copy("quasartcode-logo.png",OUT+"/img/quasartcode.png")
 js=js.replace('__IMG__',json.dumps(IMG)).replace('__PAGE__','{}')
 RESET=':root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}'
 SB={"url":"https://oqjmjavnyfjdpezjelht.supabase.co","key":"sb_publishable_kNPbFEl2_f70YY6tYOyJ0g_X49hPwfe"}

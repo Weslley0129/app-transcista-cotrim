@@ -128,61 +128,46 @@ const atendeTxt = () => { const d=CFG.diasAtende.slice().sort(); if(d.length===2
 
 /* ---------- trança animada em canvas: três mechas que se cruzam ---------- */
 function hexRgb(h){ const n=parseInt(h.slice(1),16); return [n>>16&255,n>>8&255,n&255]; }
-/* ---------- twist realista (duas mechas torcidas, fios, brilho e anéis dourados), desenhada pixel a pixel ---------- */
-const FIB=(()=>{ const a=new Float32Array(128); let s=7; for(let i=0;i<128;i++){ s=(s*16807)%2147483647; a[i]=0.84+0.3*(s/2147483647); } return a; })();
-const LX=-0.45,LY=-0.55,LZ=0.70, HXv=-0.245,HYv=-0.299,HZv=0.924;
-function drawTwist(cv,t){
-  const dpr=Math.min(1.6,window.devicePixelRatio||1), cw=cv.clientWidth, ch=cv.clientHeight; if(!cw||!ch) return;
-  const W=Math.round(cw*dpr), H=Math.round(ch*dpr);
-  if(cv.width!==W||cv.height!==H||!cv._buf){ cv.width=W; cv.height=H; const g0=cv.getContext("2d"); cv._img=g0.createImageData(W,H); cv._buf=new Uint32Array(cv._img.data.buffer); }
-  const buf=cv._buf; buf.fill(0);
-  const cs=(cv.dataset.cols||"#9A4A22").split(",").map(hexRgb), A=cs[0], B=cs[1]&&cs[1].join()!==A.join()?cs[1]:A.map(v=>v*0.88);
-  const R=Math.min(W*0.27,H*0.13), P=R*2.25, TAU=Math.PI*2;
-  const cuffs=(cv.dataset.cuffs||"0.36,0.74").split(",").map(Number).filter(n=>n>0).map(f=>f*H), hc=R*0.62, Rc=R*1.05;
-  const put=(i,r,g,b,a)=>{ buf[i]=((a|0)<<24)|((b<0?0:b>255?255:b|0)<<16)|((g<0?0:g>255?255:g|0)<<8)|(r<0?0:r>255?255:r|0); };
-  for(let y=0;y<H;y++){
-    const ax=W/2+W*0.04*Math.sin(y/H*3.4+0.7), row=y*W;
-    let shadow=1; for(const yc of cuffs){ const d=y-(yc+hc/2); if(d>=0&&d<R*0.4) shadow=Math.min(shadow,0.45+0.55*d/(R*0.4)); const d2=(yc-hc/2)-y; if(d2>=0&&d2<R*0.15) shadow=Math.min(shadow,0.75+0.25*d2/(R*0.15)); }
-    const x0=Math.max(0,Math.floor(ax-R*1.12)), x1=Math.min(W-1,Math.ceil(ax+R*1.12));
-    for(let x=x0;x<=x1;x++){
-      const u=(x+0.5-ax)/R, au=u<0?-u:u; if(au>=1.1) continue;
-      const uc=u>0.999?0.999:u<-0.999?-0.999:u;
-      const h=y/P-Math.asin(uc)/TAU+t, v2=h*2, fl=Math.floor(v2), v=v2-fl, si=fl&1;
-      const lobe=Math.sin(Math.PI*v), rf=0.74+0.26*Math.pow(lobe,0.6);
-      const fi=(si<<6)+((v*64)|0), fv=FIB[fi&127], fv2=FIB[(fi+1)&127], fr=v*64-((v*64)|0), fiber=fv+(fv2-fv)*fr;
-      if(au>=rf){ /* fiozinhos soltos na borda */
-        if(au<rf+0.09){ const hn=FIB[(((v*151)|0)+fl*11)&127]; if(hn>1.1){ const a=(1-(au-rf)/0.09)*110*(hn-1.1)*8; const col=si?B:A; put(row+x,col[0]*0.55,col[1]*0.55,col[2]*0.55,a>200?200:a); } }
-        continue; }
-      const uu=u/rf, z=Math.sqrt(Math.max(0,1-uu*uu)), c=Math.cos(Math.PI*v);
-      let nx=uu*0.9-c*0.22, ny=-c*0.72, nz=z; const nl=Math.sqrt(nx*nx+ny*ny+nz*nz); nx/=nl; ny/=nl; nz/=nl;
-      const dif=Math.max(0,nx*LX+ny*LY+nz*LZ), rim=Math.pow(Math.max(0,nx),3)*0.25;
-      const occ=Math.pow(lobe,0.42)*(0.62+0.38*z);
-      const strands=0.88+0.12*Math.sin(v*TAU*37+fiber*9+si*2.3), grain=0.94+0.06*Math.sin(y*0.9+v*80);
-      const sp=Math.max(0,nx*HXv+ny*HYv+nz*HZv), spec=(Math.pow(sp,34)*0.42+Math.pow(sp,8)*0.08)*strands*occ*fiber;
-      const col=si?B:A, k=(0.2+0.95*dif+rim)*occ*fiber*strands*grain*shadow;
-      const a=Math.min(1,(rf-au)*R*0.8)*255;
-      put(row+x,col[0]*k+255*spec,col[1]*k+238*spec,col[2]*k+215*spec,a);
+/* ---------- tranças reais (foto) recoloridas pela cor escolhida; anéis dourados preservados ---------- */
+const HAIR={img:null,ready:false};
+const CUFFS=[[289,185,27,30],[63,201,30,31],[279,307,27,31]];
+const sstep=(a,b,x)=>{ const t=x<=a?0:x>=b?1:(x-a)/(b-a); return t*t*(3-2*t); };
+function hairLoad(){ if(HAIR.img) return; const im=new Image(); HAIR.img=im;
+  im.onload=()=>{ const w=im.naturalWidth,h=im.naturalHeight,c=document.createElement("canvas"); c.width=w; c.height=h; const g=c.getContext("2d"); g.drawImage(im,0,0);
+    const s=g.getImageData(0,0,w,h).data, n=w*h; HAIR.w=w; HAIR.h=h; HAIR.src=s; HAIR.L=new Float32Array(n); HAIR.gold=new Float32Array(n); HAIR.keep=new Float32Array(n);
+    for(let i=0,j=0;i<n;i++,j+=4){ const r=s[j]/255,gg=s[j+1]/255,b=s[j+2]/255, mx=Math.max(r,gg,b), mn=Math.min(r,gg,b), L=0.2126*r+0.7152*gg+0.0722*b, sat=mx>0?(mx-mn)/mx:0;
+      HAIR.L[i]=L; HAIR.gold[i]=sstep(0.2,0.42,sat)*sstep(0.08,0.2,L)*(r>b?1:0); }
+    for(const [x,y,cw,ch] of CUFFS) for(let yy=y;yy<y+ch&&yy<h;yy++) for(let xx=x;xx<x+cw&&xx<w;xx++){ const k=yy*w+xx, j=k*4, r=s[j]/255,gg=s[j+1]/255,b=s[j+2]/255, mx=Math.max(r,gg,b), sat=mx>0?(mx-Math.min(r,gg,b))/mx:0; HAIR.keep[k]=sstep(0.12,0.3,sat)*sstep(0.1,0.28,HAIR.L[k]); }
+    HAIR.ready=true; drawAllNow(); };
+  im.src=IMG.hair; }
+const ORIGINAL_HEX=["#15100E","#2A1A12"];
+function drawHair(cv){
+  if(!HAIR.ready){ hairLoad(); return; }
+  const key=cv.dataset.cols||""; if(cv._key===key) return; cv._key=key;
+  const w=HAIR.w,h=HAIR.h; cv.width=w; cv.height=h; const g=cv.getContext("2d"), img=g.createImageData(w,h), o=img.data, s=HAIR.src;
+  const [mh,dh]=key.split(","), M=mh&&!ORIGINAL_HEX.includes(mh)?hexRgb(mh):null, D=dh?hexRgb(dh):null;
+  const M0=M?0.05+0.36*((0.2126*M[0]+0.7152*M[1]+0.0722*M[2])/255):0;
+  for(let i=0,j=0;i<w*h;i++,j+=4){
+    const r0=s[j],g0=s[j+1],b0=s[j+2], kw=HAIR.keep[i]; let r=r0,gg=g0,b=b0;
+    if(kw<1){
+      const L=HAIR.L[i], gw=HAIR.gold[i];
+      let hr=r,hg=gg,hb=b;
+      if(M){ const l=Math.min(1.5,L/0.30), f=M0+(1.12-M0)*Math.pow(l,0.75), sp=l>0.9?(l-0.9)*70:0; hr=M[0]*f+sp; hg=M[1]*f+sp*0.95; hb=M[2]*f+sp*0.85; }
+      let qr=r,qg=gg,qb=b;
+      if(D){ const l=Math.min(1.6,L/0.45), f=0.08+1.0*l, sp=l>0.95?(l-0.95)*80:0; qr=D[0]*f+sp; qg=D[1]*f+sp; qb=D[2]*f+sp; }
+      r=hr*(1-gw)+qr*gw; gg=hg*(1-gw)+qg*gw; b=hb*(1-gw)+qb*gw;
+      if(kw>0){ r=r*(1-kw)+r0*kw; gg=gg*(1-kw)+g0*kw; b=b*(1-kw)+b0*kw; }
     }
-    for(const yc of cuffs){ const e=(y-yc)/(hc/2); if(e<-1||e>1) continue;
-      const cx0=Math.max(0,Math.floor(ax-Rc-1)), cx1=Math.min(W-1,Math.ceil(ax+Rc+1));
-      const ae=e<0?-e:e, bevel=ae>0.78?0.45+0.55*(1-ae)/0.22:1, ridge=(Math.abs(e)<0.5&&Math.abs(e)>0.38)?0.7:1, hammer=0.93+0.07*Math.sin(e*31+yc);
-      for(let x=cx0;x<=cx1;x++){ const u=(x+0.5-ax)/Rc, au=u<0?-u:u; if(au>=1) continue;
-        const z=Math.sqrt(1-u*u), br=(0.16+0.95*Math.pow(z,1.8))*bevel*ridge*hammer;
-        const hl=(Math.exp(-((u+0.36)*(u+0.36))/0.008)*0.85+Math.exp(-((u-0.55)*(u-0.55))/0.02)*0.15)*bevel*(ae<0.78?1:0.4);
-        const a=Math.min(1,(1-au)*Rc*0.9)*255;
-        put(y*W+x,214*br+255*hl,160*br+240*hl,58*br+190*hl,a); } }
+    o[j]=r>255?255:r; o[j+1]=gg>255?255:gg; o[j+2]=b>255?255:b; o[j+3]=255;
   }
-  cv.getContext("2d").putImageData(cv._img,0,0);
+  g.putImageData(img,0,0);
 }
-const TW={idle:0,imp:0,last:-9,dirty:true}; let rafOn=false, lastTs=0;
-const twPhase=()=>TW.idle+(window.scrollY||0)/300;
-function twistLoop(ts){ const cvs=document.querySelectorAll("canvas[data-braid]"); if(!cvs.length){ rafOn=false; return; }
-  const dt=lastTs?Math.min(0.05,(ts-lastTs)/1000):0; lastTs=ts; TW.imp*=Math.pow(0.05,dt); TW.idle+=dt*(0.05+TW.imp);
-  const t=twPhase(); if(TW.dirty||Math.abs(t-TW.last)>0.0015){ TW.last=t; TW.dirty=false; cvs.forEach(c=>{ const r=c.getBoundingClientRect(); if(r.bottom>0&&r.top<innerHeight) drawTwist(c,t); }); }
-  requestAnimationFrame(twistLoop); }
-function drawAllNow(){ const t=twPhase(); TW.last=t; document.querySelectorAll("canvas[data-braid]").forEach(c=>drawTwist(c,t)); }
-let scrollRaf=0; window.addEventListener("scroll",()=>{ if(reduce||scrollRaf) return; scrollRaf=setTimeout(()=>{ scrollRaf=0; if(Math.abs(twPhase()-TW.last)>0.01) drawAllNow(); },60); },{passive:true});
-function startBraids(){ drawAllNow(); TW.dirty=false; if(reduce){ document.querySelectorAll("canvas[data-braid]").forEach(c=>drawTwist(c,0.3)); return; } if(!rafOn){ rafOn=true; lastTs=0; requestAnimationFrame(twistLoop); } }
+/* rolagem: profundidade (parallax), zoom leve e reflexo de luz passando pelos fios */
+function hairScroll(){ const y=window.scrollY||0;
+  document.querySelectorAll(".braid-wrap").forEach(el=>{ el.style.setProperty("--py",(-Math.min(y,700)*0.05).toFixed(1)+"px"); el.style.setProperty("--sc",(1+Math.min(y,700)/700*0.07).toFixed(3)); el.style.setProperty("--sh",((y*0.9)%520-180).toFixed(0)+"px"); }); }
+function drawAllNow(){ document.querySelectorAll("canvas[data-braid]").forEach(drawHair); hairScroll(); }
+let hsRaf=0; window.addEventListener("scroll",()=>{ if(reduce||hsRaf) return; hsRaf=requestAnimationFrame(()=>{ hsRaf=0; hairScroll(); }); setTimeout(()=>{ if(hsRaf){ cancelAnimationFrame(hsRaf); hsRaf=0; hairScroll(); } },80); },{passive:true});
+function startBraids(){ drawAllNow(); }
 const corHex = id => (corById(id)||CORES[1])[3];
 function sparkle(el,x,y){ for(let i=0;i<7;i++){ const s=document.createElement("span"); s.className="spark"; const a=Math.random()*Math.PI*2, r=30+Math.random()*40;
   s.style.cssText=`left:${x}px;top:${y}px;--dx:${Math.cos(a)*r}px;--dy:${Math.sin(a)*r}px`; s.innerHTML=ic("sparkle"); el.appendChild(s); setTimeout(()=>s.remove(),1200); } }
@@ -209,7 +194,7 @@ function Home(){
           <h1 class="brand">${esc(CFG.marca).replace(/ (\S+)$/," <em>$1</em>")}</h1>
           <span class="script">tranças impecáveis</span>
         </div>
-        <div class="braid-wrap" id="heroBraid" role="button" tabindex="0" aria-label="Twist animada na cor escolhida. Gira ao rolar a página."><canvas data-braid data-cols="${corHex(S.heroCor)}" data-cuffs="0.34,0.72" aria-hidden="true"></canvas><span class="braid-hint">role para girar</span></div>
+        <div class="braid-wrap" id="heroBraid" role="button" tabindex="0" aria-label="Foto de box braids na cor escolhida"><canvas data-braid data-cols="${corHex(S.heroCor)}" aria-hidden="true"></canvas></div>
       </div>
       <div class="hero-body"><div class="kente" aria-hidden="true"></div>
         <p class="lead">Box braids, nagô, modelos masculinos e infantis. Estilo e beleza para valorizar ainda mais a sua coroa.</p>
@@ -279,7 +264,7 @@ function Agendar(){
         <div class="sw" role="group" aria-label="Cor">${CORES.filter(k=>k[0]!=="natural"||S.cat!=="box").map(k=>`<button data-cor="${k[0]}" aria-pressed="${S.cor===k[0]}"><i style="--c:${k[3]}"></i>${k[1]}${k[2]?`<br>${k[2]}`:""}</button>`).join("")}</div></div>
       <div class="block"><span class="lbl">${ic("sparkle")} Mecha de destaque (opcional)</span>
         <div class="sw" role="group" aria-label="Destaque"><button data-dest="" aria-pressed="${!S.destaque}"><i class="none">${ic("x")}</i>Sem destaque</button>${CORES.filter(k=>k[0]!=="natural"&&k[0]!==S.cor).map(k=>`<button data-dest="${k[0]}" aria-pressed="${S.destaque===k[0]}"><i style="--c:${k[3]}"></i>${k[1]}</button>`).join("")}</div></div>
-      <div class="card preview"><canvas data-braid data-cols="${braidCols()}" data-cuffs="0.5" aria-hidden="true"></canvas><div><span class="eyebrow">Sua prévia</span><b>${esc(modeloTxt())}</b><span class="small">${esc(corTxt())}</span>${preco()?`<span class="small" style="display:block;margin-top:6px">A partir de <b class="num" style="display:inline;font-family:var(--body);font-size:14px;color:var(--gold-hi)">${brl(preco())}</b></span>`:""}</div></div>
+      <div class="card preview"><canvas data-braid data-cols="${braidCols()}" aria-hidden="true"></canvas><div><span class="eyebrow">Sua prévia</span><b>${esc(modeloTxt())}</b><span class="small">${esc(corTxt())}</span>${preco()?`<span class="small" style="display:block;margin-top:6px">A partir de <b class="num" style="display:inline;font-family:var(--body);font-size:14px;color:var(--gold-hi)">${brl(preco())}</b></span>`:""}</div></div>
       <button class="card toggle" data-tg="acess" aria-pressed="${S.acess}"><span class="box">${ic("check")}</span><div><b>Quero acessórios <span class="tag">limitados</span></b><span class="small">Anéis e enfeites dourados ou prateados, conforme o que tiver no dia.</span></div></button>
       <button class="card toggle" data-tg="blow" aria-pressed="${S.blow}"><span class="box">${ic("check")}</span><div><b>Quero blowout <span class="tag">à parte</span></b><span class="small">O blowout é cobrado separado do penteado.</span></div></button>
       <div class="note gold">${ic("photo",'style="width:16px;height:16px;vertical-align:-3px;color:var(--gold)"')} Se tiver uma foto do modelo que você quer, envie na conversa do WhatsApp depois do pedido.</div>
@@ -654,9 +639,9 @@ document.addEventListener("touchstart",()=>{},{passive:true});
 document.addEventListener("click",e=>{
   if(e.target.closest("[data-zoomx]")){ S.zoom=""; render(); return; }
   const z=e.target.closest("img[data-zoom]"); if(z){ S.zoom=z.dataset.zoom; render(); return; }
-  const hb=e.target.closest("#heroBraid"); if(hb){ TW.imp=2.4; const r=hb.getBoundingClientRect(); sparkle(hb,e.clientX?e.clientX-r.left:r.width/2,e.clientY?e.clientY-r.top:r.height/2); if(reduce) drawTwist(hb.querySelector("canvas"),Math.random()); return; }
+  const hb=e.target.closest("#heroBraid"); if(hb){ const r=hb.getBoundingClientRect(); sparkle(hb,e.clientX?e.clientX-r.left:r.width/2,e.clientY?e.clientY-r.top:r.height/2); return; }
   const hc=e.target.closest("[data-hcor]"); if(hc){ S.heroCor=hc.dataset.hcor; S.cor=S.heroCor; S.destaque=S.destaque===S.cor?"":S.destaque;
-    document.querySelectorAll("[data-hcor]").forEach(b=>b.setAttribute("aria-pressed",String(b===hc))); const c=document.querySelector("#heroBraid canvas"); if(c){ c.dataset.cols=corHex(S.heroCor); TW.imp=1.6; TW.dirty=true; if(reduce) drawTwist(c,0.3); }
+    document.querySelectorAll("[data-hcor]").forEach(b=>b.setAttribute("aria-pressed",String(b===hc))); const c=document.querySelector("#heroBraid canvas"); if(c){ c.dataset.cols=corHex(S.heroCor); drawHair(c); const w=c.parentElement; w.classList.remove("flash"); void w.offsetWidth; w.classList.add("flash"); }
     const nm=document.getElementById("heroCorNome"); if(nm) nm.textContent=corNome(S.heroCor); return; }
   const t=e.target.closest("button,a"); if(!t) return;
   const d=t.dataset;
@@ -712,7 +697,7 @@ document.addEventListener("input",e=>{ const el=e.target, id=el.id;
   if(el.dataset.cfg&&S.draft){ S.draft[el.dataset.cfg]=el.value; return; }
   if(el.dataset.preco&&S.draft){ S.draft.precos[el.dataset.preco]=el.value; return; }
 });
-window.addEventListener("resize",()=>{ TW.dirty=true; if(reduce) document.querySelectorAll("canvas[data-braid]").forEach(c=>drawTwist(c,0.3)); });
+
 
 const VALID = MODE==="painel" ? ["pedidos","painel","avaliar"] : MODE==="cliente" ? ["inicio","modelos","agendar","pix","avaliar"] : ["inicio","modelos","agendar","pix","avaliar","painel"];
 const fromHash=()=>{ const h=location.hash.slice(1); S.tab=VALID.includes(h)?h:VALID[0]; };
