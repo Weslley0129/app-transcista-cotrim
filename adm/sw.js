@@ -1,5 +1,5 @@
 /* Cotrim Tranças: cache para abrir rápido e funcionar com internet fraca */
-const V="cotrim-20261104131804-adm";
+const V="cotrim-20261104151119-adm";
 const CORE=["/", "/img/icon-adm-192.png", "/img/icon-adm-512.png", "/img/icon-adm-apple-180.png", "/img/icon-adm-maskable-512.png", "/img/quasartcode.png"];
 self.addEventListener("install",e=>{ self.skipWaiting(); e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).catch(()=>{})); });
 self.addEventListener("activate",e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });

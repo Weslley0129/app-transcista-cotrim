@@ -44,7 +44,7 @@ const esc = s => String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&l
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const CATS = [
-  {id:"box", nome:"Box Braids", img:"box", txt:"Tranças soltas com jumbo, do preto clássico ao vermelho e ao mel.", grupos:[["Espessura",["Fininha","Média","Grossa"]],["Comprimento",["Ombro","Meio das costas","Cintura"]]]},
+  {id:"box", nome:"Box Braids", img:"box", txt:"Tranças soltas com jumbo, do preto clássico ao vermelho e ao mel.", grupos:[["Espessura",["Fina","Média","Grossa"]],["Comprimento",["Ombro","Meio das costas","Cintura"]]]},
   {id:"nago", nome:"Tranças Nagô", img:"nago", txt:"Rentes ao couro cabeludo, com desenhos, coque ou anéis.", grupos:[["Estilo",["Para trás","Com desenho","Com coque","Meio preso"]]]},
   {id:"masc", nome:"Modelos Masculinos", img:"masc", txt:"Nagô e box braids para eles, retas, com desenho ou no coque.", grupos:[["Estilo",["Nagô reta","Nagô com desenho","Box com coque"]]]},
   {id:"infantil", nome:"Modelo Infantil", img:"infantil", txt:"Penteados para as pequenas, com coque, puff e linhas coloridas.", grupos:[["Estilo",["Nagô com coque","Nagô com puff","Com linhas coloridas","Meio preso"]]]},
