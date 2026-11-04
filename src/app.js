@@ -181,11 +181,14 @@ const gem=(x,y,i)=>`<g class="gem" style="--d:${i*0.9}s" transform="translate(${
   <path d="M-3.4-1.2-1.8-3.4h3.6l1.6 2.2L0 3.6z" fill="url(#gemFill)" stroke="#F4FBFF" stroke-width=".35" stroke-linejoin="round"/>
   <path d="M-3.4-1.2h6.8M-1.8-3.4-.9-1.2 0 3.6M1.8-3.4.9-1.2 0 3.6M-.9-1.2 0-3.4.9-1.2" fill="none" stroke="#9FD8F5" stroke-width=".3" opacity=".9"/>
   <path d="M-1.8-3.4-.9-1.2H-3.4z" fill="#fff" opacity=".85"/>
-  <path class="glint" d="M2.2-4.6v2.4M1-3.4h2.4" stroke="#fff" stroke-width=".5" stroke-linecap="round"/></g>`;
+  <path class="glint" d="M2.4-5.6v4.4M.2-3.4h4.4M.9-4.9l3 3M3.9-4.9l-3 3" stroke="#fff" stroke-width=".45" stroke-linecap="round"/></g>`;
 const Crown=()=>`<svg class="crown" viewBox="-4 -8 54 38" fill="none" aria-hidden="true">
-  <defs><linearGradient id="gemFill" x1="0" y1="-3.4" x2="0" y2="3.6" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#D6F1FF"/><stop offset="1" stop-color="#7CC4EA"/></linearGradient></defs>
-  <path d="M4 25 2 7l11 8 10-13 10 13 11-8-2 18z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M5.5 20.5h35" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
+  <defs><linearGradient id="gemFill" x1="0" y1="-3.4" x2="0" y2="3.6" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#DDF4FF"/><stop offset="1" stop-color="#86CCF0"/></linearGradient>
+    <linearGradient id="crownGold" x1="-40" y1="0" x2="10" y2="0" gradientUnits="userSpaceOnUse" spreadMethod="repeat"><stop offset="0" stop-color="#9A6516"/><stop offset=".3" stop-color="#E8B443"/><stop offset=".46" stop-color="#FFF4C8"/><stop offset=".54" stop-color="#FFFFFF"/><stop offset=".66" stop-color="#F7D886"/><stop offset="1" stop-color="#9A6516"/>
+      ${reduce?"":`<animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="50 0" dur="2.8s" repeatCount="indefinite"/>`}</linearGradient></defs>
+  <path d="M4 25 2 7l11 8 10-13 10 13 11-8-2 18z" fill="rgba(232,180,67,.10)" stroke="url(#crownGold)" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M5.5 20.5h35" stroke="url(#crownGold)" stroke-width="1.3" opacity=".8"/>
+  <circle cx="13.5" cy="17.6" r=".9" fill="#FFF4C8"/><circle cx="23" cy="16.4" r="1.1" fill="#fff"/><circle cx="32.5" cy="17.6" r=".9" fill="#FFF4C8"/>
   ${gem(2,3.2,0)}${gem(23,-1.6,1)}${gem(44,3.2,2)}</svg>`;
 
 /* ---------- telas ---------- */
