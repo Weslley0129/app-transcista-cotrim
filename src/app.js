@@ -1,6 +1,6 @@
 const IMG = __IMG__;
 const PAGE = __PAGE__;
-const DEF_CFG = { marca:"Cotrim Tranças", trancista:"", wa:"", cidade:"", pixTipo:"celular", pixChave:"", sinalPct:30,
+const DEF_CFG = { marca:"Cotrim Studio Tranças", trancista:"", wa:"", cidade:"", pixTipo:"celular", pixChave:"", sinalPct:30,
   precos:{box:0,nago:0,masc:0,infantil:0}, diasAtende:[0,6], fechados:["2026-12-12"], aberturas:[{mes:"2026-12",abre:"2026-11-20"}], tolerancia:10, avisoDias:2 };
 let CFG = DEF_CFG, DEPS = [];
 try{ CFG = Object.assign({},DEF_CFG,JSON.parse(document.getElementById("cfg-data").textContent)||{}); CFG.precos=Object.assign({},DEF_CFG.precos,CFG.precos||{}); }catch(e){}
@@ -641,7 +641,7 @@ const IS_STANDALONE=()=>{ try{ return matchMedia("(display-mode: standalone)").m
 const CAN_INSTALL = MODE!=="artifact";
 let installEvt=null;
 window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEvt=e; if(CAN_INSTALL) render(); });
-window.addEventListener("appinstalled",()=>{ installEvt=null; S.installed=true; S.guide=null; toast("App instalado! Procure o ícone Cotrim na tela do celular."); render(); });
+window.addEventListener("appinstalled",()=>{ installEvt=null; S.installed=true; S.guide=null; toast("App instalado! Procure o ícone Cotrim Studio na tela do celular."); render(); });
 if(CAN_INSTALL&&"serviceWorker" in navigator){ window.addEventListener("load",()=>{ navigator.serviceWorker.register("/sw.js").catch(()=>{}); }); }
 const appNome = () => MODE==="painel"?"painel":"app";
 const siteLink = () => location.origin.replace(/^https?:\/\//,"");
@@ -660,12 +660,12 @@ function Guide(){
       ["Abra no Safari",`Abra <b>${link}</b> no <b>Safari</b>, o navegador da bússola azul.`],
       ["Toque em Compartilhar",`Na barra de baixo, toque no botão ${shareIc} <b>Compartilhar</b>. No iPad ele fica em cima.`],
       ["Adicionar à Tela de Início",`Role a lista para baixo e toque em <b>Adicionar à Tela de Início</b>.`],
-      ["Confirme",`Toque em <b>Adicionar</b>, no canto de cima. O ícone ${MODE==="painel"?"Cotrim ADM":"Cotrim"} aparece na tela do iPhone.`]]
+      ["Confirme",`Toque em <b>Adicionar</b>, no canto de cima. O ícone ${MODE==="painel"?"Cotrim Studio ADM":"Cotrim Studio"} aparece na tela do iPhone.`]]
     : [
       ["Abra no Chrome",`Abra <b>${link}</b> no <b>Google Chrome</b>.`],
       ["Abra o menu",`Toque nos três pontinhos ${dots} no canto de cima, à direita.`],
       ["Instalar app",`Toque em <b>Instalar app</b>. Se não aparecer, toque em <b>Adicionar à tela inicial</b>.`],
-      ["Confirme",`Toque em <b>Instalar</b>. O ícone ${MODE==="painel"?"Cotrim ADM":"Cotrim"} aparece na tela do celular.`]];
+      ["Confirme",`Toque em <b>Instalar</b>. O ícone ${MODE==="painel"?"Cotrim Studio ADM":"Cotrim Studio"} aparece na tela do celular.`]];
   return `<div class="guide-bg" data-guidex="1"></div><div class="guide" role="dialog" aria-modal="true" aria-label="Como instalar o ${appNome()}">
     <div class="guide-h"><h2>Instalar o ${appNome()}</h2><button class="guide-x" data-guidex="1" aria-label="Fechar">${ic("x")}</button></div>
     <div class="seg guide-tabs" role="tablist"><button data-guide="android" aria-pressed="${g!=="ios"}">Android</button><button data-guide="ios" aria-pressed="${g==="ios"}">iPhone</button></div>

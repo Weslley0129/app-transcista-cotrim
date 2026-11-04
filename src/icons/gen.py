@@ -41,7 +41,7 @@ def icon(S, label, sub=None, maskable=False):
         f2 = font(int(W * (0.062 if maskable else 0.075))); tw2 = d.textlength(sub, font=f2)
         d.text((cx - tw2/2, ty + W * (0.14 if maskable else 0.17)), sub, font=f2, fill=(247, 216, 134, 255))
     return im.resize((S, S), Image.LANCZOS)
-for name, lab, sub in [("app", "Cotrim", "TRANÇAS"), ("adm", "Cotrim", "PAINEL ADM")]:
+for name, lab, sub in [("app", "Cotrim", "STUDIO"), ("adm", "Cotrim", "STUDIO · ADM")]:
     icon(512, lab, sub).convert("RGB").save(f"{name}-512.png", optimize=True)
     icon(192, lab, sub).convert("RGB").save(f"{name}-192.png", optimize=True)
     icon(512, lab, sub, maskable=True).convert("RGB").save(f"{name}-maskable-512.png", optimize=True)

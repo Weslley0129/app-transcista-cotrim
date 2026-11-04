@@ -1,4 +1,4 @@
-# Cotrim Tranças
+# Cotrim Studio Tranças
 
 App de agendamento da trancista Aline.
 

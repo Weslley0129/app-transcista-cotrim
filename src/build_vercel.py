@@ -21,9 +21,9 @@ def font(sz):
 d.rectangle((0,0,560,630),fill=(20,13,9))
 for x in range(0,560,55):
     d.rectangle((x,600,x+16,612),fill=(232,180,67)); d.rectangle((x+20,600,x+32,612),fill=(201,206,214)); d.rectangle((x+36,600,x+42,612),fill=(247,216,134))
-d.text((50,170),"Cotrim",font=font(84),fill=(255,245,232)); d.text((50,265),"Tranças",font=font(84),fill=(247,216,134))
-d.text((52,390),"Box braids · Nagô · Masculino · Infantil",font=font(24),fill=(246,214,186))
-d.text((52,430),"Agende o seu horário",font=font(30),fill=(232,180,67))
+d.text((50,120),"Cotrim",font=font(84),fill=(255,245,232)); d.text((50,215),"Studio",font=font(84),fill=(255,245,232)); d.text((50,310),"Tranças",font=font(70),fill=(247,216,134))
+d.text((52,412),"Box braids · Nagô · Masculino · Infantil",font=font(24),fill=(246,214,186))
+d.text((52,452),"Agende o seu horário",font=font(30),fill=(232,180,67))
 og.save(f'{OUT}/og.jpg','JPEG',quality=82)
 
 css=open('style.css').read(); js=open('app.js').read()
@@ -79,14 +79,14 @@ def pwa(root,kind,name,short,desc,start):
       open(root+"/manifest.webmanifest","w"),ensure_ascii=False)
     core=["/"]+["/img/"+f for f in os.listdir(root+"/img") if f.endswith((".png",".jpg"))]
     open(root+"/sw.js","w").write(SWT.replace("__VERSION__",VER+"-"+kind).replace("__CORE__",json.dumps(core)))
-open(f'{OUT}/index.html','w').write(page("cliente","Cotrim Tranças","Tranças com a Aline: box braids, nagô, masculino e infantil. Veja os modelos e agende o seu horário.",False,APP_URL+"/","{app:'/'}"))
+open(f'{OUT}/index.html','w').write(page("cliente","Cotrim Studio Tranças","Tranças com a Aline: box braids, nagô, masculino e infantil. Veja os modelos e agende o seu horário.",False,APP_URL+"/","{app:'/'}"))
 # painel em site separado (projeto Vercel próprio, pasta adm/)
 os.makedirs(OUT+"/adm/img"); shutil.copy("quasartcode-logo.png",OUT+"/adm/img/quasartcode.png")
-adm=page("painel","Painel ADM · Cotrim Tranças","Painel administrativo da trancista.",True,ADM_URL+"/","{app:'"+APP_URL+"/',painel:location.origin+'/'}").replace(BASE+"/og.jpg",APP_URL+"/og.jpg")
-open(f'{OUT}/adm/index.html','w').write(adm.replace("__ICON__","adm").replace("__SHORT__","Cotrim ADM"))
-pwa(OUT,"app","Cotrim Tranças","Cotrim","Veja os modelos e agende a sua trança com a Aline.","/?source=app")
-pwa(OUT+"/adm","adm","Cotrim · Painel ADM","Cotrim ADM","Pedidos, agenda e avaliações da Cotrim Tranças.","/?source=app")
-ci=open(f'{OUT}/index.html').read().replace("__ICON__","app").replace("__SHORT__","Cotrim"); open(f'{OUT}/index.html','w').write(ci)
+adm=page("painel","Painel ADM · Cotrim Studio Tranças","Painel administrativo da trancista.",True,ADM_URL+"/","{app:'"+APP_URL+"/',painel:location.origin+'/'}").replace(BASE+"/og.jpg",APP_URL+"/og.jpg")
+open(f'{OUT}/adm/index.html','w').write(adm.replace("__ICON__","adm").replace("__SHORT__","Cotrim Studio ADM"))
+pwa(OUT,"app","Cotrim Studio Tranças","Cotrim Studio","Veja os modelos e agende a sua trança com a Aline.","/?source=app")
+pwa(OUT+"/adm","adm","Cotrim Studio · Painel ADM","Cotrim Studio ADM","Pedidos, agenda e avaliações da Cotrim Studio Tranças.","/?source=app")
+ci=open(f'{OUT}/index.html').read().replace("__ICON__","app").replace("__SHORT__","Cotrim Studio"); open(f'{OUT}/index.html','w').write(ci)
 SWH={"source":"/sw.js","headers":[{"key":"Cache-Control","value":"no-cache"},{"key":"Service-Worker-Allowed","value":"/"}]}
 MFH={"source":"/manifest.webmanifest","headers":[{"key":"Content-Type","value":"application/manifest+json"}]}
 json.dump({"cleanUrls":True,"headers":[{"source":"/(.*)","headers":[{"key":"X-Robots-Tag","value":"noindex, nofollow"},{"key":"X-Frame-Options","value":"DENY"}]},SWH,MFH]},open(f'{OUT}/adm/vercel.json','w'))
