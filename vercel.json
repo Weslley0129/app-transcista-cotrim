@@ -1,1 +1,1 @@
-{"cleanUrls": true, "trailingSlash": false, "headers": [{"source": "/painel", "headers": [{"key": "X-Robots-Tag", "value": "noindex"}]}]}
+{"cleanUrls": true, "trailingSlash": false, "redirects": [{"source": "/painel", "destination": "/", "permanent": false}, {"source": "/adm", "destination": "/", "permanent": false}, {"source": "/adm/:path*", "destination": "/", "permanent": false}, {"source": "/src/:path*", "destination": "/", "permanent": false}]}

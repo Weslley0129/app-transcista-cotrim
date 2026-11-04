@@ -1,7 +1,8 @@
 import json, os, re, shutil, sys
 from PIL import Image
 BASE = sys.argv[1] if len(sys.argv)>1 else "https://cotrim-trancas.vercel.app"
-OUT = "dist"; shutil.rmtree(OUT, ignore_errors=True); os.makedirs(OUT+"/img"); os.makedirs(OUT+"/painel")
+OUT = "dist"; shutil.rmtree(OUT, ignore_errors=True); os.makedirs(OUT+"/img"); os.makedirs(OUT+"/adm")
+APP_URL="https://cotrim-trancas.vercel.app"; ADM_URL="https://cotrim-trancas-adm.vercel.app"
 # fotos como arquivos
 for n,k in [('p2','nago'),('p3','infantil'),('p4','box'),('p5','masc')]:
     im=Image.open('/mnt/user-data/uploads/'+n+'.jpeg').convert('RGB'); w,h=im.size
@@ -32,7 +33,7 @@ js=js.replace('__IMG__',json.dumps(IMG)).replace('__PAGE__','{}')
 RESET=':root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}'
 SB={"url":"https://oqjmjavnyfjdpezjelht.supabase.co","key":"sb_publishable_kNPbFEl2_f70YY6tYOyJ0g_X49hPwfe"}
 FAIL='''<script>(function(){function show(m){if(window.__appOk)return;var a=document.getElementById("app");if(!a||document.getElementById("fail"))return;var d=document.createElement("div");d.id="fail";d.setAttribute("style","margin:16px 0;padding:16px;border-radius:16px;background:#140D09;border:2px solid #E8B443;font:15px/1.5 system-ui,sans-serif;color:#FFF5E8");d.innerHTML='<b>Não foi possível abrir o app neste navegador.</b><br>Abra o link no Chrome ou no Safari, ou atualize o navegador do celular. Para agendar, chame no WhatsApp: <b>(11) 95454-7431</b>.';a.insertBefore(d,a.firstChild)}window.addEventListener("error",function(e){show(e.message||"erro")});setTimeout(function(){show("timeout")},8000)})();</script>'''
-def page(mode,title,desc,robots,url):
+def page(mode,title,desc,robots,url,links):
     return f'''<!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -56,14 +57,19 @@ def page(mode,title,desc,robots,url):
 <div class="tabbar"><nav id="tabs" aria-label="Navegação principal"></nav></div>
 <div id="toast" class="toast" hidden></div>
 {FAIL}
-<script>window.APP_MODE="{mode}";window.SB_CFG={json.dumps(SB)};window.APP_LINKS={{app:"/",painel:location.origin+"/painel"}};</script>
+<script>window.APP_MODE="{mode}";window.SB_CFG={json.dumps(SB)};window.APP_LINKS={links};</script>
 <script id="cfg-data" type="application/json">{json.dumps(cfg,ensure_ascii=False)}</script>
 <script id="dep-data" type="application/json">[]</script>
 <script id="main-js">{js}</script>
 </body></html>
 '''
-open(f'{OUT}/index.html','w').write(page("cliente","Cotrim Tranças","Tranças com a Aline: box braids, nagô, masculino e infantil. Veja os modelos e agende o seu horário.",False,BASE+"/"))
-open(f'{OUT}/painel/index.html','w').write(page("painel","Painel · Cotrim Tranças","Painel da trancista.",True,BASE+"/painel"))
-json.dump({"cleanUrls":True,"trailingSlash":False,"headers":[{"source":"/painel","headers":[{"key":"X-Robots-Tag","value":"noindex"}]}]},open(f'{OUT}/vercel.json','w'))
+open(f'{OUT}/index.html','w').write(page("cliente","Cotrim Tranças","Tranças com a Aline: box braids, nagô, masculino e infantil. Veja os modelos e agende o seu horário.",False,APP_URL+"/","{app:'/'}"))
+# painel em site separado (projeto Vercel próprio, pasta adm/)
+os.makedirs(OUT+"/adm/img"); shutil.copy("quasartcode-logo.png",OUT+"/adm/img/quasartcode.png")
+adm=page("painel","Painel ADM · Cotrim Tranças","Painel administrativo da trancista.",True,ADM_URL+"/","{app:'"+APP_URL+"/',painel:location.origin+'/'}").replace(BASE+"/og.jpg",APP_URL+"/og.jpg")
+open(f'{OUT}/adm/index.html','w').write(adm)
+json.dump({"cleanUrls":True,"headers":[{"source":"/(.*)","headers":[{"key":"X-Robots-Tag","value":"noindex, nofollow"},{"key":"X-Frame-Options","value":"DENY"}]}]},open(f'{OUT}/adm/vercel.json','w'))
+# o site das clientes não expõe o painel
+json.dump({"cleanUrls":True,"trailingSlash":False,"redirects":[{"source":"/painel","destination":"/","permanent":False},{"source":"/adm","destination":"/","permanent":False},{"source":"/adm/:path*","destination":"/","permanent":False},{"source":"/src/:path*","destination":"/","permanent":False}]},open(f'{OUT}/vercel.json','w'))
 for r,_,fs in os.walk(OUT):
     for f in fs: print(os.path.join(r,f), os.path.getsize(os.path.join(r,f)))
