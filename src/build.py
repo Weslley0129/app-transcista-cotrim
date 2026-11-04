@@ -17,7 +17,7 @@ js=open('app.js').read()
 img=open('img.json').read()
 page=json.dumps({"skel":SKEL,"head":HEAD,"body":BODY},ensure_ascii=True).replace('</','<\\/')
 js=js.replace('__IMG__',img).replace('__PAGE__',page)
-cfg={"marca":"Cotrim Studio Tranças","trancista":"Aline","wa":"5511954547431","cidade":"","pixTipo":"email","pixChave":"Cotrim2294@outlook.com","sinalPct":30,"precos":{"box":0,"nago":0,"masc":0,"infantil":0},"diasAtende":[0,6],"fechados":["2026-12-12"],"aberturas":[{"mes":"2026-12","abre":"2026-11-20"}],"tolerancia":10,"avisoDias":2}
+cfg={"marca":"Cotrim Studio Tranças","trancista":"Aline","wa":"5511954547431","cidade":"","instagram":"studioscotrim","pixTipo":"email","pixChave":"Cotrim2294@outlook.com","sinalPct":30,"precos":{"box":0,"nago":0,"masc":0,"infantil":0},"diasAtende":[0,6],"fechados":["2026-12-12"],"aberturas":[{"mes":"2026-12","abre":"2026-11-20"}],"tolerancia":10,"avisoDias":2}
 out=HEAD+'<style id="main-css">'+css+'</style>\n'+BODY+'\n<script id="cfg-data" type="application/json">'+json.dumps(cfg,ensure_ascii=False)+'</script>\n<script id="dep-data" type="application/json">[]</script>\n<script id="main-js">'+js+'</script>\n'
 open('index.html','w').write(out)
 print(len(out))

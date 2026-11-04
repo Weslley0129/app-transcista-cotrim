@@ -370,3 +370,11 @@ body.noscroll{overflow:hidden}
 .guide-steps span{font-size:14px;color:var(--muted);line-height:1.45}
 .guide-steps span b{display:inline;color:var(--ink)}
 .inl{width:18px;height:18px;vertical-align:-4px;color:var(--gold-hi)}
+
+/* Instagram */
+.insta{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px 14px;align-items:center;padding:16px}
+.insta .row2{grid-column:1/-1}
+.ig-badge{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;color:#fff;background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fdf497 5%,#fd5949 45%,#d6249f 60%,#285AEB 90%)}
+.ig-badge svg{width:26px;height:26px}
+.insta-t b{display:block;font-size:16px}
+.daylist li a.link{display:inline}

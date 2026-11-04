@@ -391,6 +391,14 @@ body.noscroll{overflow:hidden}
 .guide-steps span{font-size:14px;color:var(--muted);line-height:1.45}
 .guide-steps span b{display:inline;color:var(--ink)}
 .inl{width:18px;height:18px;vertical-align:-4px;color:var(--gold-hi)}
+
+/* Instagram */
+.insta{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px 14px;align-items:center;padding:16px}
+.insta .row2{grid-column:1/-1}
+.ig-badge{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;color:#fff;background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fdf497 5%,#fd5949 45%,#d6249f 60%,#285AEB 90%)}
+.ig-badge svg{width:26px;height:26px}
+.insta-t b{display:block;font-size:16px}
+.daylist li a.link{display:inline}
 </style>
 </head><body>
 <div class="app" id="app"></div>
@@ -398,11 +406,11 @@ body.noscroll{overflow:hidden}
 <div id="toast" class="toast" hidden></div>
 <script>(function(){function show(m){if(window.__appOk)return;var a=document.getElementById("app");if(!a||document.getElementById("fail"))return;var d=document.createElement("div");d.id="fail";d.setAttribute("style","margin:16px 0;padding:16px;border-radius:16px;background:#140D09;border:2px solid #E8B443;font:15px/1.5 system-ui,sans-serif;color:#FFF5E8");d.innerHTML='<b>Não foi possível abrir o app neste navegador.</b><br>Abra o link no Chrome ou no Safari, ou atualize o navegador do celular. Para agendar, chame no WhatsApp: <b>(11) 95454-7431</b>.';a.insertBefore(d,a.firstChild)}window.addEventListener("error",function(e){show(e.message||"erro")});setTimeout(function(){show("timeout")},8000)})();</script>
 <script>window.APP_MODE="painel";window.SB_CFG={"url": "https://oqjmjavnyfjdpezjelht.supabase.co", "key": "sb_publishable_kNPbFEl2_f70YY6tYOyJ0g_X49hPwfe"};window.APP_LINKS={app:'https://cotrim-trancas.vercel.app/',painel:location.origin+'/'};</script>
-<script id="cfg-data" type="application/json">{"marca": "Cotrim Studio Tranças", "trancista": "Aline", "wa": "5511954547431", "cidade": "", "pixTipo": "email", "pixChave": "Cotrim2294@outlook.com", "sinalPct": 30, "precos": {"box": 0, "nago": 0, "masc": 0, "infantil": 0}, "diasAtende": [0, 6], "fechados": ["2026-12-12"], "aberturas": [{"mes": "2026-12", "abre": "2026-11-20"}], "tolerancia": 10, "avisoDias": 2}</script>
+<script id="cfg-data" type="application/json">{"marca": "Cotrim Studio Tranças", "trancista": "Aline", "wa": "5511954547431", "cidade": "", "instagram": "studioscotrim", "pixTipo": "email", "pixChave": "Cotrim2294@outlook.com", "sinalPct": 30, "precos": {"box": 0, "nago": 0, "masc": 0, "infantil": 0}, "diasAtende": [0, 6], "fechados": ["2026-12-12"], "aberturas": [{"mes": "2026-12", "abre": "2026-11-20"}], "tolerancia": 10, "avisoDias": 2}</script>
 <script id="dep-data" type="application/json">[]</script>
 <script id="main-js">const IMG = {"nago": "/img/nago.jpg", "infantil": "/img/infantil.jpg", "box": "/img/box.jpg", "masc": "/img/masc.jpg", "quasar": "/img/quasartcode.png", "hair": "/img/hero-braids.jpg"};
 const PAGE = {};
-const DEF_CFG = { marca:"Cotrim Studio Tranças", trancista:"", wa:"", cidade:"", pixTipo:"celular", pixChave:"", sinalPct:30,
+const DEF_CFG = { marca:"Cotrim Studio Tranças", trancista:"", wa:"", cidade:"", instagram:"", pixTipo:"celular", pixChave:"", sinalPct:30,
   precos:{box:0,nago:0,masc:0,infantil:0}, diasAtende:[0,6], fechados:["2026-12-12"], aberturas:[{mes:"2026-12",abre:"2026-11-20"}], tolerancia:10, avisoDias:2 };
 let CFG = DEF_CFG, DEPS = [];
 try{ CFG = Object.assign({},DEF_CFG,JSON.parse(document.getElementById("cfg-data").textContent)||{}); CFG.precos=Object.assign({},DEF_CFG.precos,CFG.precos||{}); }catch(e){}
@@ -430,6 +438,8 @@ const ICON = {
   heart:'<path d="M12 20s-7.5-4.6-9.2-9.3C1.6 7.2 4 4 7.3 4c2 0 3.6 1.1 4.7 2.7C13.1 5.1 14.7 4 16.7 4 20 4 22.4 7.2 21.2 10.7 19.5 15.4 12 20 12 20z"/>',
   snack:'<path d="M4 11h16l-1.5 9h-13z"/><path d="M7 11c0-3 2-6 5-6s5 3 5 6"/><path d="M12 5V2"/>',
   palette:'<path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-2 0-1.5-1.4-1.5-1.4-3 0-1 .8-1.7 1.8-1.7H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="15" cy="7" r="1.2"/>',
+  insta:'<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/>',
+  send:'<path d="M21 3 10 14"/><path d="M21 3l-7 18-4-7-7-4z"/>',
   download:'<path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 20h14"/>',
   check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>', plus:'<path d="M12 5v14M5 12h14"/>', x:'<path d="M6 6l12 12M18 6 6 18"/>',
   l:'<path d="m15 5-7 7 7 7"/>', r:'<path d="m9 5 7 7-7 7"/>',
@@ -575,6 +585,18 @@ const corHex = id => (corById(id)||CORES[1])[3];
 function sparkle(el,x,y){ for(let i=0;i<7;i++){ const s=document.createElement("span"); s.className="spark"; const a=Math.random()*Math.PI*2, r=30+Math.random()*40;
   s.style.cssText=`left:${x}px;top:${y}px;--dx:${Math.cos(a)*r}px;--dy:${Math.sin(a)*r}px`; s.innerHTML=ic("sparkle"); el.appendChild(s); setTimeout(()=>s.remove(),1200); } }
 
+/* ---------- Instagram ---------- */
+const igUser = () => String(CFG.instagram||"").trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i,"").replace(/[/?#].*$/,"").replace(/^@/,"");
+const igProfile = () => igUser()?`https://www.instagram.com/${igUser()}/`:"";
+const igDirect = () => igUser()?`https://ig.me/m/${igUser()}`:"";
+function InstaCard(){
+  if(!igUser()) return "";
+  return `<div class="card insta"><span class="ig-badge">${ic("insta")}</span>
+    <div class="insta-t"><b>@${esc(igUser())}</b><span class="small">Veja os trabalhos, a agenda do mês e as novidades no Instagram.</span></div>
+    <div class="row2"><a class="btn" href="${igProfile()}" target="_blank" rel="noopener">${ic("insta")} Seguir</a><a class="btn" href="${igDirect()}" target="_blank" rel="noopener">${ic("send")} Direct</a></div></div>`;
+}
+const igTag = (txt) => igUser()?`<li>${ic("insta")} ${txt} <a class="link" href="${igProfile()}" target="_blank" rel="noopener">@${esc(igUser())}</a></li>`:"";
+
 /* ---------- crédito do desenvolvedor ---------- */
 const DEV_URL = "https://www.quasartcode.com.br/?utm_source=cotrim-trancas&utm_medium=app&utm_campaign=desenvolvido-por";
 const DevBy = () => `<a class="devby" href="${DEV_URL}" target="_blank" rel="noopener" aria-label="Desenvolvido pela QuasarTcode. Abrir o site quasartcode.com.br"><span>Desenvolvido pela</span><img src="${IMG.quasar}" alt="QuasarTcode" width="120" height="77"><small>quasartcode.com.br</small></a>`;
@@ -644,7 +666,8 @@ function Home(){
     <div class="motto"><div class="kente" style="width:120px" aria-hidden="true"></div><span class="script">Conto com a compreensão de todas!</span></div>
     <div class="row2"><button class="btn btn-ghost" data-go="pix">${ic("pix")} Pagar com Pix</button><button class="btn btn-ghost" data-go="avaliar">${ic("star")} Avaliações</button></div>
     ${waDigits()?`<p class="small" style="text-align:center;margin:0">WhatsApp: <b class="num" style="user-select:all">${fmtPhone(waDigits())}</b> <button class="link" data-copy="${fmtPhone(waDigits())}" data-msg="Número copiado">Copiar</button></p>`:""}
-    <footer class="foot">${esc(CFG.marca)} · Agende já o seu horário!</footer>
+    ${InstaCard()}
+    <footer class="foot">${esc(CFG.marca)} · Agende já o seu horário!${igUser()?` · <a class="link" href="${igProfile()}" target="_blank" rel="noopener">@${esc(igUser())}</a>`:""}</footer>
     ${DevBy()}
   </section>`;
 }
@@ -714,6 +737,7 @@ function Agendar(){
         <li>${ic("clock")} Chegar no horário (tolerância de ${CFG.tolerancia} min)</li>
         <li>${ic("palette")} Foto do modelo e a cor já enviadas</li>
         <li>${ic("snack")} Vir sem pressa: tem lanchinho da mãe</li>
+        ${igTag("Depois, poste a sua trança e marque")}
       </ul>
       <button class="link" data-new>Fazer novo pedido</button></div></section>`;
     const ac=ACORDOS(), feitos=ac.filter(([k])=>S.regras[k]).length, okAll=feitos===ac.length;
@@ -824,7 +848,7 @@ function Avaliar(){
       list.map(r=>`<div class="card rev"><div class="rev-h"><b>${esc(r.nome)}${r.modelo?` <span class="small">· ${esc(r.modelo)}</span>`:""}</b>${starRow(r.nota)}</div>${r.texto?`<p>${esc(r.texto)}</p>`:""}${r.data?`<span class="small num">${fmtShort(r.data)}/${r.data.slice(0,4)}</span>`:""}${S.canEdit?`<button class="rev-rm" data-rmrev="${esc(r.id)}" ${S.busy?"disabled":""}>${S.rmConfirm===r.id?"Toque de novo para remover":"Remover"}</button>`:""}</div>`).join("")
     : `<div class="card empty"><span style="color:var(--gold)">${ic("star",'style="width:34px;height:34px"')}</span><b>Ainda não há avaliações publicadas</b><span class="small">Fez a sua trança? Conte como foi e ajude outras clientes a escolher.</span></div>`;
   let form;
-  if(S.rSent) form=`<div class="card done-card"><span class="ok">${ic("check")}</span><h2>Obrigada pela avaliação!</h2><p class="lead">${SBC?`Recebemos a sua avaliação. Ela aparece aqui assim que ${esc(nomeT())} aprovar.`:"Se o WhatsApp abriu, toque em enviar. A sua avaliação aparece aqui depois que for publicada."}</p>
+  if(S.rSent) form=`<div class="card done-card"><span class="ok">${ic("check")}</span><h2>Obrigada pela avaliação!</h2>${igUser()?`<p class="small" style="margin:0">Poste a sua trança nos stories e marque <a class="link" href="${igProfile()}" target="_blank" rel="noopener">@${esc(igUser())}</a>.</p>`:""}<p class="lead">${SBC?`Recebemos a sua avaliação. Ela aparece aqui assim que ${esc(nomeT())} aprovar.`:"Se o WhatsApp abriu, toque em enviar. A sua avaliação aparece aqui depois que for publicada."}</p>
     ${SBC?"":`<div class="row2" style="width:100%">${waHref(rMsg())?`<a class="btn btn-wa" href="${waHref(rMsg())}" target="_blank" rel="noopener">${ic("wa")} Abrir de novo</a>`:""}<button class="btn btn-ghost" data-copy="${esc(rMsg())}" data-msg="Avaliação copiada">${ic("copy")} Copiar texto</button></div>`}
     <button class="link" data-rnew>Fazer outra avaliação</button></div>`;
   else form=`<div class="card rate"><h2 style="text-align:center">Avalie ${CFG.trancista?esc(CFG.trancista):"a sua trança"}</h2>
@@ -854,6 +878,7 @@ function Painel(){
       <div class="field"><label class="small" for="c_marca">Nome do studio</label><input id="c_marca" data-cfg="marca" value="${esc(D.marca)}" maxlength="32"></div>
       <div class="field"><label class="small" for="c_trancista">Seu nome</label><input id="c_trancista" data-cfg="trancista" value="${esc(D.trancista)}" maxlength="30" placeholder="Ex.: Jéssica"></div>
       <div class="grid2"><div class="field"><label class="small" for="c_wa">WhatsApp com DDD</label><input id="c_wa" data-cfg="wa" type="tel" inputmode="tel" value="${esc(D.wa)}" placeholder="(11) 9 0000-0000"></div>
+      <div class="field"><label class="small" for="c_insta">Instagram (@)</label><input id="c_insta" data-cfg="instagram" value="${esc(D.instagram||"")}" placeholder="seuperfil" autocomplete="off"></div>
       <div class="field"><label class="small" for="c_cidade">Cidade</label><input id="c_cidade" data-cfg="cidade" value="${esc(D.cidade)}" placeholder="Guarulhos"></div></div></div>
     <div class="card admin"><h3>Pix</h3>
       <div class="seg">${[["celular","Celular"],["cpf","CPF/CNPJ"],["email","E-mail"],["aleatoria","Aleatória"]].map(([k,n])=>`<button data-pixtipo="${k}" aria-pressed="${D.pixTipo===k}">${n}</button>`).join("")}</div>
@@ -895,7 +920,7 @@ async function saveAll(cfg,deps,okMsg){
   } finally { S.busy=false; render(); }
 }
 function cleanDraft(){ const D=JSON.parse(JSON.stringify(S.draft));
-  D.marca=(D.marca||"").trim()||DEF_CFG.marca; D.trancista=(D.trancista||"").trim(); D.cidade=(D.cidade||"").trim(); D.wa=String(D.wa||"").replace(/\D/g,"");
+  D.marca=(D.marca||"").trim()||DEF_CFG.marca; D.instagram=String(D.instagram||"").trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i,"").replace(/[/?#].*$/,"").replace(/^@/,""); D.trancista=(D.trancista||"").trim(); D.cidade=(D.cidade||"").trim(); D.wa=String(D.wa||"").replace(/\D/g,"");
   D.sinalPct=Math.min(100,Math.max(0,parseInt(D.sinalPct)||30)); D.tolerancia=Math.max(0,parseInt(D.tolerancia)||10); D.avisoDias=Math.max(0,parseInt(D.avisoDias)||2);
   CATS.forEach(c=>D.precos[c.id]=parseValor(D.precos[c.id]));
   const mes=document.getElementById("c_ab_mes"), dia=document.getElementById("c_ab_dia");
