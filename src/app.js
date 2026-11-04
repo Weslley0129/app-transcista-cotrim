@@ -176,6 +176,18 @@ function sparkle(el,x,y){ for(let i=0;i<7;i++){ const s=document.createElement("
 const DEV_URL = "https://www.quasartcode.com.br/?utm_source=cotrim-trancas&utm_medium=app&utm_campaign=desenvolvido-por";
 const DevBy = () => `<a class="devby" href="${DEV_URL}" target="_blank" rel="noopener" aria-label="Desenvolvido pela QuasarTcode. Abrir o site quasartcode.com.br"><span>Desenvolvido pela</span><img src="${IMG.quasar}" alt="QuasarTcode" width="120" height="77"><small>quasartcode.com.br</small></a>`;
 
+/* coroa dourada com um diamante em cada ponta */
+const gem=(x,y,i)=>`<g class="gem" style="--d:${i*0.9}s" transform="translate(${x} ${y})">
+  <path d="M-3.4-1.2-1.8-3.4h3.6l1.6 2.2L0 3.6z" fill="url(#gemFill)" stroke="#F4FBFF" stroke-width=".35" stroke-linejoin="round"/>
+  <path d="M-3.4-1.2h6.8M-1.8-3.4-.9-1.2 0 3.6M1.8-3.4.9-1.2 0 3.6M-.9-1.2 0-3.4.9-1.2" fill="none" stroke="#9FD8F5" stroke-width=".3" opacity=".9"/>
+  <path d="M-1.8-3.4-.9-1.2H-3.4z" fill="#fff" opacity=".85"/>
+  <path class="glint" d="M2.2-4.6v2.4M1-3.4h2.4" stroke="#fff" stroke-width=".5" stroke-linecap="round"/></g>`;
+const Crown=()=>`<svg class="crown" viewBox="-4 -8 54 38" fill="none" aria-hidden="true">
+  <defs><linearGradient id="gemFill" x1="0" y1="-3.4" x2="0" y2="3.6" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".45" stop-color="#D6F1FF"/><stop offset="1" stop-color="#7CC4EA"/></linearGradient></defs>
+  <path d="M4 25 2 7l11 8 10-13 10 13 11-8-2 18z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M5.5 20.5h35" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
+  ${gem(2,3.2,0)}${gem(23,-1.6,1)}${gem(44,3.2,2)}</svg>`;
+
 /* ---------- telas ---------- */
 function OwnerBar(){ return S.canEdit?`<div class="owner-bar"><button data-go="painel">${ic("gear")} Painel da trancista</button></div>`:""; }
 function Opening(){
@@ -189,7 +201,7 @@ function Home(){
     <div class="hero">
       <div class="hero-top">
         <div class="hero-txt">
-          <svg class="crown" viewBox="0 0 46 30" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 25 2 7l11 8 10-13 10 13 11-8-2 18z"/><circle cx="2" cy="6" r="2" fill="currentColor"/><circle cx="23" cy="2" r="2" fill="currentColor"/><circle cx="44" cy="6" r="2" fill="currentColor"/></svg>
+          ${Crown()}
           <span class="eyebrow">Trancista${CFG.trancista?" · "+esc(CFG.trancista):""}</span>
           <h1 class="brand">${esc(CFG.marca).replace(/ (\S+)$/," <em>$1</em>")}</h1>
           <span class="script">tranças impecáveis</span>
@@ -527,7 +539,7 @@ function Login(){
     <button class="btn btn-gold btn-block" data-setpw ${S.busy?"disabled":""}>${ic("check")} Salvar senha</button>${S.authMsg?`<div class="note gold">${esc(S.authMsg)}</div>`:""}</div></section>`;
   const logged=S.session&&!S.isAdmin;
   return `<section class="screen">
-    <div class="head"><svg class="crown" viewBox="0 0 46 30" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 25 2 7l11 8 10-13 10 13 11-8-2 18z"/></svg><span class="eyebrow">Painel da trancista</span><h1>${esc(CFG.marca)}</h1><p class="lead">Entre para ver os pedidos, mudar preços e dias e aprovar avaliações.</p></div>
+    <div class="head">${Crown()}<span class="eyebrow">Painel da trancista</span><h1>${esc(CFG.marca)}</h1><p class="lead">Entre para ver os pedidos, mudar preços e dias e aprovar avaliações.</p></div>
     ${logged?`<div class="note">Este e-mail não tem acesso ao painel. Entre com o e-mail da Aline.</div><button class="btn btn-ghost btn-block" data-logout>Sair</button>`:`
     <div class="card admin">
       <div class="field"><label class="small" for="lg_email">E-mail</label><input id="lg_email" type="email" autocomplete="username" value="${esc(S.lgEmail)}"></div>
