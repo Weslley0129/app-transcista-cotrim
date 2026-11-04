@@ -618,6 +618,13 @@ function render(){
   startBraids();
 }
 
+/* onda de luz no ponto do toque */
+document.addEventListener("pointerdown",e=>{ const b=e.target.closest&&e.target.closest(".btn"); if(!b||b.disabled||reduce) return;
+  const r=b.getBoundingClientRect(), sp=document.createElement("span"); sp.className="ripple";
+  sp.style.left=(e.clientX-r.left)+"px"; sp.style.top=(e.clientY-r.top)+"px"; sp.style.setProperty("--rs",Math.ceil(Math.hypot(r.width,r.height)/6));
+  b.appendChild(sp); setTimeout(()=>sp.remove(),650);
+  if(navigator.vibrate&&e.pointerType==="touch"){ try{navigator.vibrate(8)}catch(_){} } },{passive:true});
+document.addEventListener("touchstart",()=>{},{passive:true});
 document.addEventListener("click",e=>{
   if(e.target.closest("[data-zoomx]")){ S.zoom=""; render(); return; }
   const z=e.target.closest("img[data-zoom]"); if(z){ S.zoom=z.dataset.zoom; render(); return; }

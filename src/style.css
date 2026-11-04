@@ -277,3 +277,24 @@ input:focus,textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 
 .copy{padding:8px 16px;border-radius:999px;font-size:13px}
 .owner-bar button{color:#F1F2F5}
 .open-chip .d{flex:none}
+
+/* botões interativos: brilho passando, elevação, afundar ao tocar e onda de luz */
+.btn,.copy,.owner-bar button{transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .22s ease,border-color .22s ease,filter .22s ease;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.btn::before{content:"";position:absolute;top:-30%;bottom:-30%;left:-60%;width:38%;z-index:-1;pointer-events:none;transform:skewX(-22deg);
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.08) 30%,rgba(235,238,245,.42) 50%,rgba(255,255,255,.08) 70%,transparent);
+  animation:sweep 4.2s ease-in-out infinite}
+.btn:nth-of-type(2)::before{animation-delay:1.1s}
+@keyframes sweep{0%,62%{left:-60%}100%{left:130%}}
+@media (hover:hover){
+  .btn:hover,.copy:hover,.owner-bar button:hover{transform:translateY(-2px);filter:brightness(1.12);border-color:rgba(245,247,250,.95);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -3px 8px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.6),0 0 22px -2px rgba(220,225,235,.55),0 12px 24px -12px rgba(0,0,0,.9)}
+  .btn:hover::before{animation:sweep-fast .7s ease-out}
+}
+@keyframes sweep-fast{from{left:-60%}to{left:130%}}
+.btn:active,.copy:active,.owner-bar button:active,.btn.pressed{transform:translateY(1px) scale(.97);filter:brightness(.92);
+  box-shadow:inset 0 3px 10px rgba(0,0,0,.85),inset 0 -1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(0,0,0,.6),0 0 14px -4px rgba(220,225,235,.5)}
+.btn .ripple{position:absolute;z-index:-1;border-radius:50%;pointer-events:none;width:12px;height:12px;margin:-6px 0 0 -6px;
+  background:radial-gradient(circle,rgba(245,247,252,.75),rgba(245,247,252,.25) 45%,transparent 70%);animation:ripple .6s ease-out forwards}
+@keyframes ripple{from{transform:scale(1);opacity:1}to{transform:scale(var(--rs,30));opacity:0}}
+.btn:focus-visible{outline:2px solid #E6E9EF;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.btn::before{display:none}.btn,.copy{transition:none}}
