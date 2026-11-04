@@ -328,3 +328,21 @@ input:focus,textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 
 .crown .glint{transform-box:fill-box;transform-origin:center;animation:glint 2.7s ease-in-out infinite;animation-delay:var(--d,0s);opacity:0}
 @keyframes glint{0%,60%,100%{opacity:0;transform:scale(.3) rotate(0)}72%{opacity:1;transform:scale(1.25) rotate(45deg)}84%{opacity:0;transform:scale(.6) rotate(90deg)}}
 @media (prefers-reduced-motion:reduce){.crown .glint{animation:none;opacity:.8}}
+
+/* compatibilidade com celulares mais antigos (iOS 14 e Android antigos) */
+.sw i,.hsw button{background-color:var(--c)}
+@supports not (aspect-ratio:1/1){
+  .cat{height:0;padding-top:113%}
+  .pick{height:0;padding-top:100%}
+  .model img{height:auto}
+  .cal-g button{height:42px}
+}
+@supports not (inset:0){
+  body::before{top:0;left:0;right:0}
+  .hero::before,.braid-wrap canvas,.cat img,.pick img,.zoom{top:0;right:0;bottom:0;left:0}
+  .braid-wrap canvas{top:-5%;bottom:auto}
+  .cat span,.pick span{left:0;right:0;bottom:0;top:auto}
+}
+/* telas estreitas: botões lado a lado sem cortar o texto */
+@media (max-width:400px){ .row2 .btn{font-size:14px;padding-inline:10px;gap:6px;letter-spacing:0} .row2 .btn svg{width:17px;height:17px} }
+@media (max-width:345px){ .row2{grid-template-columns:1fr} .hero-top{grid-template-columns:minmax(0,1fr) 42%} .brand{font-size:32px} }
