@@ -9,21 +9,14 @@ for n,k in [('p2','nago'),('p3','infantil'),('p4','box'),('p5','masc')]:
     g=im.convert('L'); rows=[sum(g.crop((0,y,w,y+1)).getdata())/w for y in range(h)]
     top=next(y for y in range(h) if rows[y]>18); bot=h-next(y for y in range(h) if rows[h-1-y]>18)
     im=im.crop((0,top,w,bot)); im.thumbnail((900,900)); im.save(f'{OUT}/img/{k}.jpg','JPEG',quality=78,optimize=True,progressive=True)
-# imagem de prévia para o WhatsApp (1200x630)
-src=Image.open(f'{OUT}/img/box.jpg'); og=Image.new('RGB',(1200,630),(181,83,42))
-s2=src.copy(); s2.thumbnail((630,630)); og.paste(s2,(1200-s2.width,0))
+# imagem de prévia para o WhatsApp (1200x630): logo à esquerda, foto das tranças à direita
 from PIL import ImageDraw, ImageFont
-d=ImageDraw.Draw(og)
-def font(sz):
-    for f in ["/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf","/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"]:
-        if os.path.exists(f): return ImageFont.truetype(f,sz)
-    return ImageFont.load_default()
-d.rectangle((0,0,560,630),fill=(20,13,9))
-for x in range(0,560,55):
-    d.rectangle((x,600,x+16,612),fill=(232,180,67)); d.rectangle((x+20,600,x+32,612),fill=(201,206,214)); d.rectangle((x+36,600,x+42,612),fill=(247,216,134))
-d.text((50,120),"Cotrim",font=font(84),fill=(255,245,232)); d.text((50,215),"Studio",font=font(84),fill=(255,245,232)); d.text((50,310),"Tranças",font=font(70),fill=(247,216,134))
-d.text((52,412),"Box braids · Nagô · Masculino · Infantil",font=font(24),fill=(246,214,186))
-d.text((52,452),"Agende o seu horário",font=font(30),fill=(232,180,67))
+og=Image.new('RGB',(1200,630),(11,8,6))
+ph=Image.open('hero-braids.jpg').convert('RGB'); ph=ph.resize((560,int(ph.height*560/ph.width))); og.paste(ph.crop((0,0,560,630)),(640,0))
+fade=Image.new('L',(220,630)); fd=ImageDraw.Draw(fade)
+for x in range(220): fd.line((x,0,x,630),fill=int(255*(1-x/219)))
+og.paste(Image.new('RGB',(220,630),(11,8,6)),(640,0),fade)
+lg=Image.open('icons/logo-circle.png'); lg=lg.resize((580,580),Image.LANCZOS); og.paste(lg,(40,25),lg)
 og.save(f'{OUT}/og.jpg','JPEG',quality=82)
 
 css=open('style.css').read(); js=open('app.js').read()
@@ -49,7 +42,7 @@ def page(mode,title,desc,robots,url,links):
 <meta property="og:type" content="website"><meta property="og:title" content="{title}"><meta property="og:description" content="{desc}">
 <meta property="og:url" content="{url}"><meta property="og:image" content="{BASE}/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 30'%3E%3Cpath d='M4 25 2 7l11 8 10-13 10 13 11-8-2 18z' fill='%23E8B443'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="48x48" href="/img/icon-__ICON__-48.png"><link rel="icon" type="image/png" sizes="192x192" href="/img/icon-__ICON__-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yeseva+One&family=Yellowtail&family=Outfit:wght@400;500;600;700&family=Lexend:wght@600;700&display=swap">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
@@ -72,7 +65,7 @@ VER="cotrim-"+time.strftime("%Y%m%d%H%M%S")
 SWT=open("sw_template.js").read()
 def pwa(root,kind,name,short,desc,start):
     os.makedirs(root+"/img",exist_ok=True)
-    for f in ["192","512","maskable-512","apple-180"]: shutil.copy(f"icons/{kind}-{f}.png",f"{root}/img/icon-{kind}-{f}.png")
+    for f in ["48","192","512","maskable-512","apple-180"]: shutil.copy(f"icons/{kind}-{f}.png",f"{root}/img/icon-{kind}-{f}.png")
     json.dump({"name":name,"short_name":short,"description":desc,"lang":"pt-BR","dir":"ltr","start_url":start,"scope":"/","id":"/","display":"standalone","orientation":"portrait",
       "background_color":"#140D09","theme_color":"#140D09","categories":["beauty","lifestyle"],
       "icons":[{"src":f"/img/icon-{kind}-192.png","sizes":"192x192","type":"image/png"},{"src":f"/img/icon-{kind}-512.png","sizes":"512x512","type":"image/png"},{"src":f"/img/icon-{kind}-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]},
