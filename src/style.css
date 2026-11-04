@@ -37,13 +37,8 @@ h1{font-size:30px} h2{font-size:23px} h3{font-size:18px}
 .btn{position:relative;overflow:hidden;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:6px 18px;border-radius:999px;font-weight:700;font-size:15px;text-decoration:none;text-align:center;line-height:1.25;transition:transform .15s}
 .btn:active{transform:scale(.98)}
 .btn svg{width:19px;height:19px;flex:none}
-.btn-gold{background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:#1B1008;box-shadow:0 8px 22px -10px var(--gold)}
-.btn-mag{background:linear-gradient(180deg,#EEF1F5,var(--magenta));color:#111;box-shadow:0 8px 22px -10px var(--magenta)}
-.btn-wa{background:var(--wa);color:var(--wa-ink)}
-.btn-ghost{background:var(--surface-2);border:1px solid var(--line)}
 .btn-block{width:100%}
 .btn[disabled]{opacity:.4;pointer-events:none}
-.btn-gold::after,.btn-mag::after,.btn-wa::after{content:"";position:absolute;top:-20%;bottom:-20%;left:-40%;width:30%;z-index:-1;background:linear-gradient(100deg,transparent,rgba(255,255,255,.6),transparent);transform:skewX(-20deg);animation:shine 3.6s ease-in-out infinite;pointer-events:none}
 @keyframes shine{0%{left:-40%}55%,100%{left:120%}}
 .link{color:var(--gold-hi);font-weight:700;font-size:13.5px;display:inline-flex;align-items:center;gap:4px}
 .link svg{width:14px;height:14px}
@@ -266,3 +261,19 @@ input:focus,textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 
 .devby small{font-size:11.5px;color:var(--gold-hi)}
 .devby:hover{border-color:var(--gold);transform:translateY(-1px)}
 .snack b,.open-chip b{display:block}
+
+/* botões: preto brilhante com borda prateada (padrão "Pedir orçamento") */
+.btn,.copy,.owner-bar button{
+  background:linear-gradient(180deg,#4A4A4E 0%,#1E1E21 38%,#0A0A0B 62%,#151517 100%);
+  color:#F1F2F5; border:1px solid rgba(225,228,235,.55);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -3px 8px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.6),0 8px 20px -10px rgba(0,0,0,.9);
+  font-family:"Lexend",var(--body);font-weight:700;letter-spacing:.02em;
+  text-shadow:0 1px 0 rgba(0,0,0,.7),0 0 8px rgba(255,255,255,.18)}
+.btn svg,.copy svg{color:#DDE0E6;filter:drop-shadow(0 1px 0 rgba(0,0,0,.6))}
+.btn::after{content:"";position:absolute;top:1px;left:10%;right:10%;height:40%;border-radius:999px;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,0))}
+.btn:hover,.copy:hover,.owner-bar button:hover{border-color:rgba(240,242,246,.85);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -3px 8px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.6),0 0 16px -4px rgba(225,228,235,.45)}
+.btn:active{background:linear-gradient(180deg,#0A0A0B 0%,#1E1E21 60%,#2A2A2E 100%)}
+.btn-wa svg{color:#25D366}
+.copy{padding:8px 16px;border-radius:999px;font-size:13px}
+.owner-bar button{color:#F1F2F5}
+.open-chip .d{flex:none}
