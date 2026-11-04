@@ -39,7 +39,11 @@ def page(mode,title,desc,robots,url,links):
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>{title}</title>
 <meta name="description" content="{desc}">
-<meta name="theme-color" content="#B5532A">
+<meta name="theme-color" content="#140D09">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/img/icon-__ICON__-apple-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="__SHORT__">
 <meta name="author" content="QuasarTcode"><link rel="author" href="https://www.quasartcode.com.br">
 {'<meta name="robots" content="noindex,nofollow">' if robots else ''}
 <meta property="og:type" content="website"><meta property="og:title" content="{title}"><meta property="og:description" content="{desc}">
@@ -63,13 +67,30 @@ def page(mode,title,desc,robots,url,links):
 <script id="main-js">{js}</script>
 </body></html>
 '''
+import time
+VER="cotrim-"+time.strftime("%Y%m%d%H%M%S")
+SWT=open("sw_template.js").read()
+def pwa(root,kind,name,short,desc,start):
+    os.makedirs(root+"/img",exist_ok=True)
+    for f in ["192","512","maskable-512","apple-180"]: shutil.copy(f"icons/{kind}-{f}.png",f"{root}/img/icon-{kind}-{f}.png")
+    json.dump({"name":name,"short_name":short,"description":desc,"lang":"pt-BR","dir":"ltr","start_url":start,"scope":"/","id":"/","display":"standalone","orientation":"portrait",
+      "background_color":"#140D09","theme_color":"#140D09","categories":["beauty","lifestyle"],
+      "icons":[{"src":f"/img/icon-{kind}-192.png","sizes":"192x192","type":"image/png"},{"src":f"/img/icon-{kind}-512.png","sizes":"512x512","type":"image/png"},{"src":f"/img/icon-{kind}-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]},
+      open(root+"/manifest.webmanifest","w"),ensure_ascii=False)
+    core=["/"]+["/img/"+f for f in os.listdir(root+"/img") if f.endswith((".png",".jpg"))]
+    open(root+"/sw.js","w").write(SWT.replace("__VERSION__",VER+"-"+kind).replace("__CORE__",json.dumps(core)))
 open(f'{OUT}/index.html','w').write(page("cliente","Cotrim Tranças","Tranças com a Aline: box braids, nagô, masculino e infantil. Veja os modelos e agende o seu horário.",False,APP_URL+"/","{app:'/'}"))
 # painel em site separado (projeto Vercel próprio, pasta adm/)
 os.makedirs(OUT+"/adm/img"); shutil.copy("quasartcode-logo.png",OUT+"/adm/img/quasartcode.png")
 adm=page("painel","Painel ADM · Cotrim Tranças","Painel administrativo da trancista.",True,ADM_URL+"/","{app:'"+APP_URL+"/',painel:location.origin+'/'}").replace(BASE+"/og.jpg",APP_URL+"/og.jpg")
-open(f'{OUT}/adm/index.html','w').write(adm)
-json.dump({"cleanUrls":True,"headers":[{"source":"/(.*)","headers":[{"key":"X-Robots-Tag","value":"noindex, nofollow"},{"key":"X-Frame-Options","value":"DENY"}]}]},open(f'{OUT}/adm/vercel.json','w'))
+open(f'{OUT}/adm/index.html','w').write(adm.replace("__ICON__","adm").replace("__SHORT__","Cotrim ADM"))
+pwa(OUT,"app","Cotrim Tranças","Cotrim","Veja os modelos e agende a sua trança com a Aline.","/?source=app")
+pwa(OUT+"/adm","adm","Cotrim · Painel ADM","Cotrim ADM","Pedidos, agenda e avaliações da Cotrim Tranças.","/?source=app")
+ci=open(f'{OUT}/index.html').read().replace("__ICON__","app").replace("__SHORT__","Cotrim"); open(f'{OUT}/index.html','w').write(ci)
+SWH={"source":"/sw.js","headers":[{"key":"Cache-Control","value":"no-cache"},{"key":"Service-Worker-Allowed","value":"/"}]}
+MFH={"source":"/manifest.webmanifest","headers":[{"key":"Content-Type","value":"application/manifest+json"}]}
+json.dump({"cleanUrls":True,"headers":[{"source":"/(.*)","headers":[{"key":"X-Robots-Tag","value":"noindex, nofollow"},{"key":"X-Frame-Options","value":"DENY"}]},SWH,MFH]},open(f'{OUT}/adm/vercel.json','w'))
 # o site das clientes não expõe o painel
-json.dump({"cleanUrls":True,"trailingSlash":False,"redirects":[{"source":"/painel","destination":"/","permanent":False},{"source":"/adm","destination":"/","permanent":False},{"source":"/adm/:path*","destination":"/","permanent":False},{"source":"/src/:path*","destination":"/","permanent":False}]},open(f'{OUT}/vercel.json','w'))
+json.dump({"cleanUrls":True,"trailingSlash":False,"redirects":[{"source":"/painel","destination":"/","permanent":False},{"source":"/adm","destination":"/","permanent":False},{"source":"/adm/:path*","destination":"/","permanent":False},{"source":"/src/:path*","destination":"/","permanent":False}],"headers":[SWH,MFH]},open(f'{OUT}/vercel.json','w'))
 for r,_,fs in os.walk(OUT):
     for f in fs: print(os.path.join(r,f), os.path.getsize(os.path.join(r,f)))

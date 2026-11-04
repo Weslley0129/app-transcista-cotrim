@@ -28,6 +28,7 @@ const ICON = {
   heart:'<path d="M12 20s-7.5-4.6-9.2-9.3C1.6 7.2 4 4 7.3 4c2 0 3.6 1.1 4.7 2.7C13.1 5.1 14.7 4 16.7 4 20 4 22.4 7.2 21.2 10.7 19.5 15.4 12 20 12 20z"/>',
   snack:'<path d="M4 11h16l-1.5 9h-13z"/><path d="M7 11c0-3 2-6 5-6s5 3 5 6"/><path d="M12 5V2"/>',
   palette:'<path d="M12 3a9 9 0 1 0 0 18c1.2 0 2-.8 2-2 0-1.5-1.4-1.5-1.4-3 0-1 .8-1.7 1.8-1.7H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="15" cy="7" r="1.2"/>',
+  download:'<path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 20h14"/>',
   check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>', plus:'<path d="M12 5v14M5 12h14"/>', x:'<path d="M6 6l12 12M18 6 6 18"/>',
   l:'<path d="m15 5-7 7 7 7"/>', r:'<path d="m9 5 7 7-7 7"/>',
   copy:'<rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>',
@@ -221,6 +222,7 @@ function Home(){
       </div>
     </div>
 
+    ${InstallCard()}
     <div class="section-h"><h2>Modelos</h2><button class="link" data-go="modelos">Ver todos ${ic("r")}</button></div>
     <div class="cats">${CATS.map(c=>`<button class="cat" data-go="modelos" data-to="${c.id}"><img src="${IMG[c.img]}" alt="Exemplos de ${c.nome}" loading="lazy"><span>${c.nome}${CFG.precos[c.id]>0?`<small>a partir de ${brl(+CFG.precos[c.id])}</small>`:""}</span></button>`).join("")}</div>
 
@@ -467,7 +469,7 @@ function Painel(){
       <div class="addrow"><input id="c_novo" type="date" value="${esc(S.novaData)}" aria-label="Novo dia sem atendimento"><button class="btn btn-ghost" data-addfech>${ic("plus")} Bloquear</button></div>
       <div class="grid2"><div class="field"><label class="small" for="c_tol">Tolerância (min)</label><input id="c_tol" data-cfg="tolerancia" inputmode="numeric" value="${esc(D.tolerancia)}"></div><div class="field"><label class="small" for="c_aviso">Aviso prévio (dias)</label><input id="c_aviso" data-cfg="avisoDias" inputmode="numeric" value="${esc(D.avisoDias)}"></div></div></div>
     <button class="btn btn-gold btn-block" data-savecfg ${S.busy?"disabled":""}>${ic("check")} ${S.busy?"Salvando…":"Salvar e atualizar o app"}</button>
-    <button class="btn btn-ghost btn-block" data-go="${MODE==="painel"?"pedidos":"inicio"}">Cancelar</button>${MODE==="painel"?`<button class="btn btn-ghost btn-block" data-logout>Sair do painel</button>`:""}
+    <button class="btn btn-ghost btn-block" data-go="${MODE==="painel"?"pedidos":"inicio"}">Cancelar</button>${MODE==="painel"?`${InstallCard()}<button class="btn btn-ghost btn-block" data-logout>Sair do painel</button>`:""}
     ${DevBy()}
   </section>`;
 }
@@ -553,6 +555,7 @@ function Login(){
       <p class="small" style="margin:0">No primeiro acesso, crie uma senha e confirme pelo link que chega no e-mail.</p>
     </div>`}
     ${LINKS.app?`<a class="link" style="align-self:center" href="${LINKS.app}" target="_blank" rel="noopener">Abrir o app das clientes ${ic("r")}</a>`:""}
+    ${InstallCard()}
     ${DevBy()}
   </section>`;
 }
@@ -629,6 +632,55 @@ async function sbClick(d){
   return false;
 }
 
+
+/* ---------- baixar o app (instalar na tela inicial) ---------- */
+const UA=navigator.userAgent||"";
+const IS_IOS=/iPhone|iPad|iPod/i.test(UA)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const IN_APP=/Instagram|FBAN|FBAV|FB_IAB|Line\/|TikTok|musical_ly|Snapchat/i.test(UA);
+const IS_STANDALONE=()=>{ try{ return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true; }catch(e){ return false; } };
+const CAN_INSTALL = MODE!=="artifact";
+let installEvt=null;
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); installEvt=e; if(CAN_INSTALL) render(); });
+window.addEventListener("appinstalled",()=>{ installEvt=null; S.installed=true; S.guide=null; toast("App instalado! Procure o ícone Cotrim na tela do celular."); render(); });
+if(CAN_INSTALL&&"serviceWorker" in navigator){ window.addEventListener("load",()=>{ navigator.serviceWorker.register("/sw.js").catch(()=>{}); }); }
+const appNome = () => MODE==="painel"?"painel":"app";
+const siteLink = () => location.origin.replace(/^https?:\/\//,"");
+function InstallCard(){
+  if(!CAN_INSTALL||IS_STANDALONE()||S.installed) return "";
+  return `<div class="card install">
+    <img src="${MODE==="painel"?"/img/icon-adm-192.png":"/img/icon-app-192.png"}" alt="" width="56" height="56">
+    <div class="install-t"><b>${MODE==="painel"?"Instale o painel no celular":"Baixe o app no seu celular"}</b><span class="small">${MODE==="painel"?"Abra os pedidos com um toque, direto da tela inicial.":"Fica com ícone na tela inicial e abre em tela cheia, sem procurar o link."}</span></div>
+    <button class="btn btn-block" data-install>${ic("download")} ${installEvt?(MODE==="painel"?"Instalar o painel":"Instalar o app"):(MODE==="painel"?"Como instalar o painel":"Baixar o app")}</button>
+    <div class="install-links"><button class="link" data-guide="android">Passo a passo Android</button><button class="link" data-guide="ios">Passo a passo iPhone</button></div>
+  </div>`;
+}
+function Guide(){
+  const g=S.guide, link=siteLink(), shareIc=`<svg class="inl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-label="ícone Compartilhar"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5"/><path d="M6 11H5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8a1 1 0 0 0-1-1h-1"/></svg>`, dots=`<svg class="inl" viewBox="0 0 24 24" fill="currentColor" aria-label="três pontinhos"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>`;
+  const STEPS = g==="ios" ? [
+      ["Abra no Safari",`Abra <b>${link}</b> no <b>Safari</b>, o navegador da bússola azul.`],
+      ["Toque em Compartilhar",`Na barra de baixo, toque no botão ${shareIc} <b>Compartilhar</b>. No iPad ele fica em cima.`],
+      ["Adicionar à Tela de Início",`Role a lista para baixo e toque em <b>Adicionar à Tela de Início</b>.`],
+      ["Confirme",`Toque em <b>Adicionar</b>, no canto de cima. O ícone ${MODE==="painel"?"Cotrim ADM":"Cotrim"} aparece na tela do iPhone.`]]
+    : [
+      ["Abra no Chrome",`Abra <b>${link}</b> no <b>Google Chrome</b>.`],
+      ["Abra o menu",`Toque nos três pontinhos ${dots} no canto de cima, à direita.`],
+      ["Instalar app",`Toque em <b>Instalar app</b>. Se não aparecer, toque em <b>Adicionar à tela inicial</b>.`],
+      ["Confirme",`Toque em <b>Instalar</b>. O ícone ${MODE==="painel"?"Cotrim ADM":"Cotrim"} aparece na tela do celular.`]];
+  return `<div class="guide-bg" data-guidex="1"></div><div class="guide" role="dialog" aria-modal="true" aria-label="Como instalar o ${appNome()}">
+    <div class="guide-h"><h2>Instalar o ${appNome()}</h2><button class="guide-x" data-guidex="1" aria-label="Fechar">${ic("x")}</button></div>
+    <div class="seg guide-tabs" role="tablist"><button data-guide="android" aria-pressed="${g!=="ios"}">Android</button><button data-guide="ios" aria-pressed="${g==="ios"}">iPhone</button></div>
+    ${IN_APP?`<div class="note">${ic("alert",'style="width:16px;height:16px;vertical-align:-3px"')} Você abriu pelo Instagram, e de dentro dele não dá para instalar. Toque nos três pontinhos <b>⋯</b> no canto de cima e escolha <b>Abrir no navegador</b>${g==="ios"?" (ou <b>Abrir no Safari</b>)":""}. Depois siga os passos.</div>`:""}
+    ${g!=="ios"&&installEvt?`<button class="btn btn-block" data-install>${ic("download")} Instalar agora</button><span class="small" style="text-align:center">Ou faça pelo menu do Chrome:</span>`:""}
+    <ol class="guide-steps">${STEPS.map(([t,d],i)=>`<li><span class="n">${i+1}</span><div><b>${t}</b><span>${d}</span></div></li>`).join("")}</ol>
+    <div class="keybox"><div style="min-width:0"><span class="small" style="display:block">Link do ${appNome()}</span><span style="user-select:all">${link}</span></div><button class="copy" data-copy="https://${link}" data-msg="Link copiado">Copiar</button></div>
+    <p class="small" style="margin:0;text-align:center">O ${appNome()} é gratuito e não ocupa espaço como os apps de loja.</p>
+  </div>`;
+}
+async function doInstall(){
+  if(installEvt){ try{ installEvt.prompt(); const r=await installEvt.userChoice; installEvt=null; if(r&&r.outcome==="accepted"){ S.installed=true; S.guide=null; } render(); }catch(e){ S.guide=IS_IOS?"ios":"android"; render(); } return; }
+  S.guide=IS_IOS?"ios":"android"; render();
+}
+
 /* ---------- render ---------- */
 const TABS = MODE==="painel" ? [["pedidos","Pedidos","cal"],["painel","Ajustes","gear"],["avaliar","Avaliações","star"]] : [["inicio","Início","home"],["modelos","Modelos","braid"],["agendar","Agendar","cal"],["pix","Pix","pix"],["avaliar","Avaliar","star"]];
 const SCREENS = MODE==="painel" ? {pedidos:()=>Pedidos(),painel:Painel,avaliar:()=>AdminRev()} : {inicio:Home,modelos:Modelos,agendar:Agendar,pix:Pix,avaliar:Avaliar,painel:Painel};
@@ -636,7 +688,8 @@ function render(){
   const app=document.getElementById("app");
   const ae=document.activeElement, focusId=ae&&ae.id, selStart=ae&&ae.selectionStart;
   const gate = MODE==="painel" && (!S.isAdmin || S.recovery);
-  app.innerHTML = gate ? Login() : (SCREENS[S.tab]||SCREENS[TABS[0][0]])();
+  app.innerHTML = (gate ? Login() : (SCREENS[S.tab]||SCREENS[TABS[0][0]])()) + (S.guide&&CAN_INSTALL ? Guide() : "");
+  document.body.classList.toggle("noscroll",!!S.guide);
   document.querySelector(".tabbar").hidden = gate;
   if(focusId){ const el=document.getElementById(focusId); if(el&&el.tagName!=="BUTTON"){ el.focus(); try{el.setSelectionRange(selStart,selStart)}catch(e){} } }
   document.getElementById("tabs").innerHTML=TABS.map(([id,l,i])=>`<button class="tab" data-go="${id}" ${S.tab===id?'aria-current="page"':""}><span class="ti">${ic(i)}</span>${l}</button>`).join("")+(MODE==="painel"&&LINKS.app?`<a class="tab" href="${LINKS.app}" target="_blank" rel="noopener" style="text-decoration:none"><span class="ti">${ic("home")}</span>Ver app</a>`:"");
@@ -658,8 +711,11 @@ document.addEventListener("click",e=>{
   const hc=e.target.closest("[data-hcor]"); if(hc){ S.heroCor=hc.dataset.hcor; S.cor=S.heroCor; S.destaque=S.destaque===S.cor?"":S.destaque;
     document.querySelectorAll("[data-hcor]").forEach(b=>b.setAttribute("aria-pressed",String(b===hc))); const c=document.querySelector("#heroBraid canvas"); if(c){ c.dataset.cols=corHex(S.heroCor); drawHair(c); const w=c.parentElement; w.classList.remove("flash"); void w.offsetWidth; w.classList.add("flash"); }
     const nm=document.getElementById("heroCorNome"); if(nm) nm.textContent=corNome(S.heroCor); return; }
+  if(e.target.closest("[data-guidex]")){ S.guide=null; render(); return; }
   const t=e.target.closest("button,a"); if(!t) return;
   const d=t.dataset;
+  if(d.install!==undefined){ doInstall(); return; }
+  if(d.guide){ S.guide=d.guide; render(); return; }
   if(SBC && MODE==="painel" && ["login","signup","reset","setpw","logout","pfil","reload","pst","pblock","rvpub","rvdel","rvadd"].some(k=>d[k]!==undefined)){ sbClick(d); return; }
   if(d.go){ const o={}; if(d.pickcat){ o.cat=d.pickcat; o.step=1; o.sent=false; } if(d.pixv) o.pixValor=d.pixv.replace(".",","); go(d.go,o);
     if(d.to){ const el=document.getElementById("m-"+d.to); if(el) el.scrollIntoView({block:"start"}); } return; }
@@ -704,7 +760,7 @@ document.addEventListener("click",e=>{
   if(d.addfech!==undefined){ const v=S.novaData; if(v&&!S.draft.fechados.includes(v)) S.draft.fechados.push(v); S.novaData=""; render(); return; }
   if(d.savecfg!==undefined){ if(SBC&&MODE==="painel") sbSaveCfg(cleanDraft(),"App atualizado"); else saveAll(cleanDraft(),DEPS,"App atualizado"); return; }
 });
-document.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ")&&e.target.id==="heroBraid"){ e.preventDefault(); e.target.click(); } if(e.key==="Escape"&&S.zoom){ S.zoom=""; render(); } });
+document.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ")&&e.target.id==="heroBraid"){ e.preventDefault(); e.target.click(); } if(e.key==="Escape"&&(S.zoom||S.guide)){ S.zoom=""; S.guide=null; render(); } });
 const FIELD={lg_email:"lgEmail",lg_senha:"lgSenha",lg_nova:"lgNova",nome:"nome",fone:"fone",quem:"quem",algtxt:"alergiaTxt",obs:"obs",rnome:"rNome",rtexto:"rTexto",rpaste:"rPaste",c_novo:"novaData"};
 document.addEventListener("input",e=>{ const el=e.target, id=el.id;
   if(FIELD[id]){ S[FIELD[id]]=el.value; if(id==="nome"&&S.err.nome&&el.value.trim()){ S.err.nome=false; } return; }
